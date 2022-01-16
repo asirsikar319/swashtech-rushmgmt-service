@@ -1,0 +1,22 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "Available Slot",
+	"description": "Available Slot",
+	"type": "object",
+	"properties": {
+		"orgId": {
+			"type": "string"
+		},
+		"oprId": {
+			"type": "string"
+		},
+		"timestamp": {
+			"type": "number"
+		}
+	},
+	"required": [
+		"orgId",
+		"oprId",
+		"timestamp"
+	]
+}

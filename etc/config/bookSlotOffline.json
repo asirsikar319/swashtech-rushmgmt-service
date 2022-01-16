@@ -1,0 +1,30 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "Book Slot Offline",
+	"description": "Book Slot Offline",
+	"type": "object",
+	"properties": {
+		"orgId": {
+			"type": "string"
+		},
+		"oprId": {
+			"type": "string"
+		},
+		"name": {
+			"type": "string"
+		},
+		"mobile": {
+			"type": "number"
+		},
+		"mode": {
+			"type": "string"
+		}
+	},
+	"required": [
+		"orgId",
+		"oprId",
+		"name",
+		"mobile",
+		"mode"
+	]
+}

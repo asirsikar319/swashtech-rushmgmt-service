@@ -1,0 +1,80 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "Organization",
+	"description": "Organization Details",
+	"type": "object",
+	"properties": {
+		"orgName": {
+			"type": "string"
+		},
+		"orgPhone": {
+			"type": "number"
+		},
+		"orgEmail": {
+			"type": "string"
+		},
+		"orgAddress": {
+			"type": "string"
+		},
+		"operatingUnits": {
+			"type": "array",
+			"properties": {
+				"oprName": {
+					"type": "string"
+				},
+				"oprPhone": {
+					"type": "number"
+				},
+				"oprEmail": {
+					"type": "string"
+				},
+				"oprAddress": {
+					"type": "string"
+				},
+				"oprManager": {
+					"type": "string"
+				},
+				"oprIsActive": {
+					"type": "boolean"
+				},
+				"slots": {
+					"type": "object",
+					"properties": {
+						"slDurationInMin": {
+							"type": "number"
+						},
+						"slAllowdMember": {
+							"type": "number"
+						}
+					},
+					"required": [
+						"slDurationInMin",
+						"slAllowdMember"
+					]
+				},
+				"oprCreatedBy": {
+					"type": "string"
+				},
+				"oprModifiedBy": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"oprName",
+				"oprPhone",
+				"oprEmail"
+			]
+		},
+		"orgCreatedBy": {
+			"type": "string"
+		},
+		"orgModifiedBy": {
+			"type": "string"
+		}
+	},
+	"required": [
+		"orgName",
+		"orgPhone",
+		"orgEmail"
+	]
+}
