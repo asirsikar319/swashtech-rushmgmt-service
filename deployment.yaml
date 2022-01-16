@@ -26,6 +26,18 @@ spec:
                 path: application.properties
               - key: validateOrganization.json
                 path: validateOrganization.json
+              - key: bookSlotOnline.json
+                path: bookSlotOnline.json
+              - key: bookSlotOffline.json
+                path: bookSlotOffline.json
+              - key: updateSlot.json
+                path: updateSlot.json
+              - key: cancelSlot.json
+                path: cancelSlot.json
+              - key: releaseSlot.json
+                path: releaseSlot.json
+              - key: availableSlots.json
+                path: availableSlots.json               
             defaultMode: 420
       containers:
         - name: swashtech-rushmgmt-service
