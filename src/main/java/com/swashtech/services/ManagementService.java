@@ -15,4 +15,6 @@ public interface ManagementService {
 	public JSONObject releaseSlot(JSONObject jInput);
 	
 	public JSONObject availableSlots(JSONObject jInput);
+	
+	public JSONObject availableSlots2(JSONObject jInput);
 }

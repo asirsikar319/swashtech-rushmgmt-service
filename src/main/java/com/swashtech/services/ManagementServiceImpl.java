@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.bson.Document;
 import org.json.JSONArray;
@@ -34,12 +35,38 @@ public class ManagementServiceImpl implements ManagementService {
 	public JSONObject bookSlotOnline(JSONObject jInput) {
 		JSONObject jsonObject = new JSONObject();
 		try {
+
+			Query query = new Query();
+			List<Criteria> criteriaLst = new ArrayList<Criteria>();
+			criteriaLst.add(Criteria.where("orgId").is(jInput.get("orgId")));
+			criteriaLst.add(Criteria.where("oprId").is(jInput.get("oprId")));
+			criteriaLst.add(Criteria.where("exitDateTime").gt(new Date(jInput.getLong("entryDateTime"))));
+
+			query.addCriteria(new Criteria().andOperator(criteriaLst));
+			System.err.println("query : "+query);
+			List<String> slotLst = mongoTemplate.find(query, String.class, "slots");
+			
+			System.err.println(slotLst.size());
+
+			if (slotLst != null && slotLst.size() == 5) {
+				jsonObject.put("status", "Error");
+				jsonObject.put("message",
+						"Slots not available at this time!. Please try after some time or check available slots");
+				return jsonObject;
+			}
+
 			jInput.put("tokenNo", jInput.getString("oprId") + "-" + IdGenerator.getMaxNo(mongoTemplate, "TKNGEN"));
 			jInput.put("isEnter", false);
 			jInput.put("isExit", false);
 			Document document = Document.parse(jInput.toString());
 			document.put("createdOn", new Date());
 			document.put("entryDateTime", new Date(jInput.getLong("entryDateTime")));
+			
+			Date exitTime = new Date(jInput.getLong("entryDateTime"));
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(exitTime);
+			cal.add(Calendar.MINUTE, 5);
+			document.put("exitDateTime", cal.getTime());
 			document = mongoTemplate.save(document, "slots");
 			logger.debug(document.toJson());
 			jsonObject.put("status", "Success");
@@ -55,6 +82,24 @@ public class ManagementServiceImpl implements ManagementService {
 	public JSONObject bookSlotOffline(JSONObject jInput) {
 		JSONObject jsonObject = new JSONObject();
 		try {
+
+			Query query = new Query();
+			List<Criteria> criteriaLst = new ArrayList<Criteria>();
+			criteriaLst.add(Criteria.where("orgId").is(jInput.get("orgId")));
+			criteriaLst.add(Criteria.where("oprId").is(jInput.get("oprId")));
+			criteriaLst.add(Criteria.where("isExit").is(false));
+			criteriaLst.add(Criteria.where("isEnter").is(true));
+			criteriaLst.add(Criteria.where("exitDateTime").gt(new Date()));
+			query.addCriteria(new Criteria().andOperator(criteriaLst));
+			List<String> slotLst = mongoTemplate.find(query, String.class, "slots");
+
+			if (slotLst != null && slotLst.size() == 5) {
+				jsonObject.put("status", "Error");
+				jsonObject.put("message",
+						"Slots not available at this time!. Please try after some time or check available slots");
+				return jsonObject;
+			}
+
 			jInput.put("tokenNo", jInput.getString("oprId") + "-" + IdGenerator.getMaxNo(mongoTemplate, "TKNGEN"));
 			jInput.put("isEnter", true);
 			jInput.put("isExit", false);
@@ -64,7 +109,7 @@ public class ManagementServiceImpl implements ManagementService {
 			Date exitTime = document.getDate("entryDateTime");
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(exitTime);
-			cal.add(Calendar.MINUTE, 60);
+			cal.add(Calendar.MINUTE, 5);
 			document.put("exitDateTime", cal.getTime());
 			document = mongoTemplate.save(document, "slots");
 			logger.debug(document.toJson());
@@ -82,13 +127,16 @@ public class ManagementServiceImpl implements ManagementService {
 		JSONObject jsonObject = new JSONObject();
 		try {
 			Query query = new Query();
-			query.addCriteria(Criteria.where("tokenNo").is(jInput.get("tokenNo"))
-					.andOperator(Criteria.where("isEnter").is(false)));
+			List<Criteria> criteriaLst = new ArrayList<Criteria>();
+			criteriaLst.add(Criteria.where("tokenNo").is(jInput.get("tokenNo")));
+			criteriaLst.add(Criteria.where("isEnter").is(false));
+			criteriaLst.add(Criteria.where("mode").is("online"));
+//			criteriaLst.add(Criteria.where("exitDateTime").exists(false));
+			query.addCriteria(new Criteria().andOperator(criteriaLst));
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(new Date());
-			cal.add(Calendar.MINUTE, 60);
-			Update update = new Update().set("entryDateTime", new Date()).set("exitDateTime", cal.getTime())
-					.set("isEnter", true);
+			cal.add(Calendar.MINUTE, 5);
+			Update update = new Update().set("isEnter", true);
 			UpdateResult updateResult = mongoTemplate.updateFirst(query, update, "slots");
 			jsonObject.put("status", "Success");
 			jsonObject.put("tokenNo", jInput.getString("tokenNo"));
@@ -108,8 +156,12 @@ public class ManagementServiceImpl implements ManagementService {
 		JSONObject jsonObject = new JSONObject();
 		try {
 			Query query = new Query();
-			query.addCriteria(Criteria.where("tokenNo").is(jInput.get("tokenNo"))
-					.andOperator(Criteria.where("mode").is("online")));
+			List<Criteria> criteriaLst = new ArrayList<Criteria>();
+			criteriaLst.add(Criteria.where("tokenNo").is(jInput.get("tokenNo")));
+			criteriaLst.add(Criteria.where("isEnter").is(false));
+			criteriaLst.add(Criteria.where("mode").is("online"));
+//			criteriaLst.add(Criteria.where("exitDateTime").exists(false));
+			query.addCriteria(new Criteria().andOperator(criteriaLst));
 			Update update = new Update().set("exitDateTime", new Date());
 			UpdateResult updateResult = mongoTemplate.updateFirst(query, update, "slots");
 			jsonObject.put("status", "Success");
@@ -155,16 +207,21 @@ public class ManagementServiceImpl implements ManagementService {
 		JSONObject jsonObject = new JSONObject();
 		try {
 			// Hardcode Data
-			int totalSlots = 60;
+			int totalSlots = 5;
 			int availableSlots = 0;
 
 			Query query = new Query();
 			List<Criteria> criteriaLst = new ArrayList<Criteria>();
 			criteriaLst.add(Criteria.where("orgId").is(jInput.get("orgId")));
 			criteriaLst.add(Criteria.where("oprId").is(jInput.get("oprId")));
-			criteriaLst.add(Criteria.where("isExit").is(false));
-			criteriaLst.add(Criteria.where("isEnter").is(true));
-			criteriaLst.add(Criteria.where("exitDateTime").gt(new Date(jInput.getLong("timestamp"))));
+
+//			criteriaLst.add(Criteria.where("isExit").is(false));
+//			criteriaLst.add(Criteria.where("isEnter").is(true));
+			Date date2 = new Date(jInput.getLong("timestamp"));
+			Calendar cal2 = Calendar.getInstance();
+			cal2.setTime(date2);
+			cal2.add(Calendar.MINUTE, -10);
+			criteriaLst.add(Criteria.where("exitDateTime").gt(cal2.getTime()));
 			query.addCriteria(new Criteria().andOperator(criteriaLst));
 
 			List<String> slotLst = mongoTemplate.find(query, String.class, "slots");
@@ -175,18 +232,59 @@ public class ManagementServiceImpl implements ManagementService {
 					JSONObject jsonObject2 = new JSONObject(jsonArray.getString(i));
 
 					SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+					inputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
 					Date date = inputFormat.parse(jsonObject2.getJSONObject("exitDateTime").getString("$date"));
-					availSlotList.add(date.getTime());
+					Calendar cal = Calendar.getInstance();
+					cal.setTime(date);
+					cal.add(Calendar.MINUTE, 10);
+					availSlotList.add(cal.getTimeInMillis());
 				}
 			}
 
 			if (slotLst != null && slotLst.size() != 0) {
 				availableSlots = totalSlots - slotLst.size();
+			} else {
+				availableSlots = totalSlots;
 			}
 			jsonObject.put("status", "Success");
 			jsonObject.put("totalSlots", totalSlots);
 			jsonObject.put("availableSlots", availableSlots);
 			jsonObject.put("availableInDuration", availSlotList);
+		} catch (Exception e) {
+			jsonObject.put("status", "Error");
+			jsonObject.put("message", e.getMessage());
+		}
+		return jsonObject;
+	}
+
+	@Override
+	public JSONObject availableSlots2(JSONObject jInput) {
+		JSONObject jsonObject = new JSONObject();
+		try {
+			Query query = new Query();
+			List<Criteria> criteriaLst = new ArrayList<Criteria>();
+			criteriaLst.add(Criteria.where("orgId").is(jInput.get("orgId")));
+			criteriaLst.add(Criteria.where("oprId").is(jInput.get("oprId")));
+			criteriaLst.add(Criteria.where("isExit").is(false));
+			criteriaLst.add(Criteria.where("isEnter").is(true));
+			criteriaLst.add(Criteria.where("exitDateTime").gte(new Date(jInput.getLong("frDate"))));
+			criteriaLst.add(Criteria.where("exitDateTime").lte(new Date(jInput.getLong("toDate"))));
+			query.addCriteria(new Criteria().andOperator(criteriaLst));
+
+			List<String> slotLst = mongoTemplate.find(query, String.class, "slots");
+			JSONArray jsonArray = new JSONArray(slotLst);
+			if (jsonArray != null && jsonArray.length() != 0) {
+				for (int i = 0; i < jsonArray.length(); i++) {
+					JSONObject jsonObject2 = new JSONObject(jsonArray.getString(i));
+
+					SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+					inputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+					jsonArray.getJSONObject(i).put("exitDateTime", jsonArray.getJSONObject(i).getJSONObject("exitDateTime").getString("$date"));
+				}
+			}
+
+			jsonObject.put("status", "Success");
+			jsonObject.put("availableSlots", jsonArray);
 		} catch (Exception e) {
 			jsonObject.put("status", "Error");
 			jsonObject.put("message", e.getMessage());

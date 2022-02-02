@@ -112,6 +112,9 @@
 					<exclude>**/application.properties</exclude>
 				</excludes>
 			</resource>
+			<resource>
+				<directory>etc/config</directory>
+			</resource>
 		</resources>
 	</build>
 

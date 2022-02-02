@@ -96,7 +96,7 @@ public class ManagementController {
 	}
 
 	@ApiOperation(value = "Update Slot", response = Iterable.class)
-	@RequestMapping(value = "/updateSlot", method = RequestMethod.PATCH, produces = "application/json")
+	@RequestMapping(value = "/updateSlot", method = RequestMethod.PUT, produces = "application/json")
 	public ResponseEntity<String> updateSlot(@RequestBody String input) {
 		long start = System.currentTimeMillis();
 		logger.info("start updateSlot...");
@@ -129,7 +129,7 @@ public class ManagementController {
 	}
 
 	@ApiOperation(value = "Cancel Slot", response = Iterable.class)
-	@RequestMapping(value = "/cancelSlot", method = RequestMethod.PATCH, produces = "application/json")
+	@RequestMapping(value = "/cancelSlot", method = RequestMethod.PUT, produces = "application/json")
 	public ResponseEntity<String> cancelSlot(@RequestBody String input) {
 		long start = System.currentTimeMillis();
 		logger.info("start cencelSlot...");
@@ -162,7 +162,7 @@ public class ManagementController {
 	}
 
 	@ApiOperation(value = "Release Slot", response = Iterable.class)
-	@RequestMapping(value = "/releaseSlot", method = RequestMethod.PATCH, produces = "application/json")
+	@RequestMapping(value = "/releaseSlot", method = RequestMethod.PUT, produces = "application/json")
 	public ResponseEntity<String> releaseSlot(@RequestBody String input) {
 		long start = System.currentTimeMillis();
 		logger.info("start releaseSlot...");
@@ -224,6 +224,39 @@ public class ManagementController {
 		}
 		logger.info("availableSlots response : " + response);
 		logger.info("Time taken for availableSlots() : " + (System.currentTimeMillis() - start) + " ms");
+		return response;
+	}
+	
+	@ApiOperation(value = "Available Slots 2", response = Iterable.class)
+	@RequestMapping(value = "/availableSlots2", method = RequestMethod.POST, produces = "application/json")
+	public ResponseEntity<String> availableSlots2(@RequestBody String input) {
+		long start = System.currentTimeMillis();
+		logger.info("start availableSlots...");
+		ResponseEntity<String> response = null;
+		JSONObject resp = new JSONObject();
+		try {
+			JSONObject jInput = new JSONObject(input);
+			JSONObject schema = jSchemaUtility.readResourceFile("availableSlots2.json");
+			JSONObject schemaOutput = jSchemaUtility.validateSchema(schema, jInput);
+			if (schemaOutput != null && "Success".equals(schemaOutput.getString("status"))) {
+				JSONObject json = managementService.availableSlots2(jInput);
+				if (json != null && "Success".equals(json.getString("status"))) {
+					response = new ResponseEntity<String>(json.toString(), HttpStatus.OK);
+				} else {
+					response = new ResponseEntity<String>(json.toString(),
+							json.has("httpStatus") ? (HttpStatus) json.get("httpStatus")
+									: HttpStatus.INTERNAL_SERVER_ERROR);
+				}
+			} else {
+				response = new ResponseEntity<String>(schemaOutput.toString(), HttpStatus.BAD_REQUEST);
+			}
+		} catch (Exception e) {
+			resp.put("status", "Error");
+			resp.put("message", e.getMessage());
+			response = new ResponseEntity<String>(resp.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		logger.info("availableSlots2 response : " + response);
+		logger.info("Time taken for availableSlots2() : " + (System.currentTimeMillis() - start) + " ms");
 		return response;
 	}
 
