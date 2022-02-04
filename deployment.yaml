@@ -67,3 +67,22 @@ spec:
       maxSurge: 25%
   revisionHistoryLimit: 10
   progressDeadlineSeconds: 600
+  
+---
+
+kind: Service
+apiVersion: apps/v1
+metadata:
+  name: swashtech-rushmgmt-service
+  namespace: swashtech
+  labels:
+    run: swashtech-rushmgmt-service
+spec:
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 30696
+  selector:
+    run: swashtech-rushmgmt-service
+  type: NodePort
