@@ -8,11 +8,11 @@ import org.springframework.context.annotation.PropertySource;
 
 @SpringBootApplication
 @PropertySource("file:./etc/config/application.properties")
-public class SwashtechRushmgmtServiceApplication {
+public class Application {
 
 	public static void main(String[] args) {
 		System.err.print("Starting SpringBoot");
-		ConfigurableApplicationContext context = SpringApplication.run(SwashtechRushmgmtServiceApplication.class, args);
+		ConfigurableApplicationContext context = SpringApplication.run(Application.class, args);
 		ConfigurableEnvironment env = context.getEnvironment();
 		System.err.println("MongoDB URL -------> : "+env.getProperty("spring.data.mongodb.uri"));
 	}
