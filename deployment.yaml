@@ -71,7 +71,7 @@ spec:
 ---
 
 kind: Service
-apiVersion: apps/v1
+apiVersion: v1
 metadata:
   name: swashtech-rushmgmt-service
   namespace: swashtech
