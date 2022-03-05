@@ -1,0 +1,35 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "Available Slot 2",
+	"description": "Available Slot 2",
+	"type": "object",
+	"properties": {
+		"orgId": {
+			"type": "string"
+		},
+		"oprId": {
+			"type": "string"
+		},
+		"frDate": {
+			"type": "number"
+		},
+		"toDate": {
+			"type": "number"
+		},
+		"mode": {
+			"type": "string"
+		},
+		"isEnter": {
+			"type": "boolean"
+		},
+		"isExit": {
+			"type": "boolean"
+		}
+	},
+	"required": [
+		"orgId",
+		"oprId",
+		"frDate",
+		"toDate"
+	]
+}
