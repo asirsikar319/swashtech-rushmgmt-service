@@ -231,7 +231,7 @@ public class ManagementController {
 	@RequestMapping(value = "/availableSlots2", method = RequestMethod.POST, produces = "application/json")
 	public ResponseEntity<String> availableSlots2(@RequestBody String input) {
 		long start = System.currentTimeMillis();
-		logger.info("start availableSlots...");
+		logger.info("start availableSlots2...");
 		ResponseEntity<String> response = null;
 		JSONObject resp = new JSONObject();
 		try {

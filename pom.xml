@@ -106,11 +106,7 @@
 		</plugins>
 		<resources>
 			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
-				<excludes>
-					<exclude>**/application.properties</exclude>
-				</excludes>
+				<directory>etc/config</directory>
 			</resource>
 		</resources>
 	</build>

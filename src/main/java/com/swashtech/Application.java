@@ -7,7 +7,6 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.context.annotation.PropertySource;
 
 @SpringBootApplication
-@PropertySource("file:./etc/config/application.properties")
 public class Application {
 
 	public static void main(String[] args) {

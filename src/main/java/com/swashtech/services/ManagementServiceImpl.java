@@ -87,8 +87,6 @@ public class ManagementServiceImpl implements ManagementService {
 			List<Criteria> criteriaLst = new ArrayList<Criteria>();
 			criteriaLst.add(Criteria.where("orgId").is(jInput.get("orgId")));
 			criteriaLst.add(Criteria.where("oprId").is(jInput.get("oprId")));
-			criteriaLst.add(Criteria.where("isExit").is(false));
-			criteriaLst.add(Criteria.where("isEnter").is(true));
 			criteriaLst.add(Criteria.where("exitDateTime").gt(new Date()));
 			query.addCriteria(new Criteria().andOperator(criteriaLst));
 			List<String> slotLst = mongoTemplate.find(query, String.class, "slots");
@@ -274,6 +272,7 @@ public class ManagementServiceImpl implements ManagementService {
 			criteriaLst.add(Criteria.where("exitDateTime").lte(new Date(jInput.getLong("toDate"))));
 			query.addCriteria(new Criteria().andOperator(criteriaLst));
 
+			logger.debug("query : " + query.toString());
 			List<String> slotLst = mongoTemplate.find(query, String.class, "slots");
 			JSONArray jsonArray = new JSONArray();
 			if (jsonArray != null && slotLst.size() != 0) {
