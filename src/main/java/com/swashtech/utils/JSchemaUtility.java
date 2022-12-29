@@ -58,9 +58,11 @@ public class JSchemaUtility {
 
 	public JSONObject readResourceFile(String fileName) {
 		JSONObject jsonObject = null;
-		try (FileInputStream inputStream = new FileInputStream("etc/config/" + fileName);) {
+		String currentDir = System.getProperty("user.dir");
+		logger.debug("Current Working Directory : {}", currentDir);
+		try (FileInputStream inputStream = new FileInputStream(currentDir + "etc/config/" + fileName);) {
 			String result = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-			logger.debug("readResourceFile() : result : " + result);
+			logger.debug("Schema File Content : {}", result);
 			jsonObject = new JSONObject(result);
 		} catch (IOException e) {
 			e.printStackTrace();

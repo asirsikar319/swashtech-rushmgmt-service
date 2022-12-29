@@ -32,7 +32,7 @@ public class RegistrationController {
 	@RequestMapping(value = "/registerOrganization", method = RequestMethod.POST, produces = "application/json")
 	public ResponseEntity<String> registerOrganization(@RequestBody String input) {
 		long start = System.currentTimeMillis();
-		logger.info("start registerOrganization...");
+		logger.debug("start registerOrganization...");
 		ResponseEntity<String> response = null;
 		JSONObject resp = new JSONObject();
 		try {
@@ -63,7 +63,7 @@ public class RegistrationController {
 	@RequestMapping(value = "/registerOperatingUnits", method = RequestMethod.POST, produces = "application/json")
 	public ResponseEntity<String> registerOperatingUnits(@RequestBody String input) {
 		long start = System.currentTimeMillis();
-		logger.info("start registerOperatingUnits...");
+		logger.debug("start registerOperatingUnits...");
 		ResponseEntity<String> response = null;
 		JSONObject resp = new JSONObject();
 		try {

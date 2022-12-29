@@ -33,7 +33,7 @@ public class ManagementController {
 	@RequestMapping(value = "/bookSlotOnline", method = RequestMethod.POST, produces = "application/json")
 	public ResponseEntity<String> bookSlotOnline(@RequestBody String input) {
 		long start = System.currentTimeMillis();
-		logger.info("start bookSlotOnline...");
+		logger.debug("start bookSlotOnline...");
 		ResponseEntity<String> response = null;
 		JSONObject resp = new JSONObject();
 		try {
@@ -66,7 +66,7 @@ public class ManagementController {
 	@RequestMapping(value = "/bookSlotOffline", method = RequestMethod.POST, produces = "application/json")
 	public ResponseEntity<String> bookSlotOffline(@RequestBody String input) {
 		long start = System.currentTimeMillis();
-		logger.info("start bookSlotOffline...");
+		logger.debug("start bookSlotOffline...");
 		ResponseEntity<String> response = null;
 		JSONObject resp = new JSONObject();
 		try {
@@ -99,7 +99,7 @@ public class ManagementController {
 	@RequestMapping(value = "/updateSlot", method = RequestMethod.PUT, produces = "application/json")
 	public ResponseEntity<String> updateSlot(@RequestBody String input) {
 		long start = System.currentTimeMillis();
-		logger.info("start updateSlot...");
+		logger.debug("start updateSlot...");
 		ResponseEntity<String> response = null;
 		JSONObject resp = new JSONObject();
 		try {
@@ -132,7 +132,7 @@ public class ManagementController {
 	@RequestMapping(value = "/cancelSlot", method = RequestMethod.PUT, produces = "application/json")
 	public ResponseEntity<String> cancelSlot(@RequestBody String input) {
 		long start = System.currentTimeMillis();
-		logger.info("start cencelSlot...");
+		logger.debug("start cencelSlot...");
 		ResponseEntity<String> response = null;
 		JSONObject resp = new JSONObject();
 		try {
@@ -165,7 +165,7 @@ public class ManagementController {
 	@RequestMapping(value = "/releaseSlot", method = RequestMethod.PUT, produces = "application/json")
 	public ResponseEntity<String> releaseSlot(@RequestBody String input) {
 		long start = System.currentTimeMillis();
-		logger.info("start releaseSlot...");
+		logger.debug("start releaseSlot...");
 		ResponseEntity<String> response = null;
 		JSONObject resp = new JSONObject();
 		try {
@@ -198,7 +198,7 @@ public class ManagementController {
 	@RequestMapping(value = "/availableSlots", method = RequestMethod.POST, produces = "application/json")
 	public ResponseEntity<String> availableSlots(@RequestBody String input) {
 		long start = System.currentTimeMillis();
-		logger.info("start availableSlots...");
+		logger.debug("start availableSlots...");
 		ResponseEntity<String> response = null;
 		JSONObject resp = new JSONObject();
 		try {
