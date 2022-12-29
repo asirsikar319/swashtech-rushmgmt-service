@@ -37,7 +37,9 @@ spec:
               - key: releaseSlot.json
                 path: releaseSlot.json
               - key: availableSlots.json
-                path: availableSlots.json               
+                path: availableSlots.json
+              - key: availableSlots2.json
+                path: availableSlots2.json               
             defaultMode: 420
       containers:
         - name: swashtech-rushmgmt-service
