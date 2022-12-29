@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -222,24 +223,19 @@ public class ManagementServiceImpl implements ManagementService {
 			criteriaLst.add(Criteria.where("exitDateTime").gt(cal2.getTime()));
 			query.addCriteria(new Criteria().andOperator(criteriaLst));
 
-			List<String> slotLst = mongoTemplate.find(query, String.class, "slots");
+			List<Document> slotLst = mongoTemplate.find(query, Document.class, "slots");
 			JSONArray jsonArray = new JSONArray(slotLst);
 			List<Long> availSlotList = new ArrayList<Long>();
 			if (jsonArray != null && jsonArray.length() != 0) {
-				for (int i = 0; i < jsonArray.length(); i++) {
-					JSONObject jsonObject2 = new JSONObject(jsonArray.getString(i));
+				for (Document document : slotLst) {
 					try {
-						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-						inputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-						Date date = inputFormat.parse(jsonObject2.getJSONObject("exitDateTime").getString("$date"));
 						Calendar cal = Calendar.getInstance();
-						cal.setTime(date);
+						cal.setTime(document.getDate("exitDateTime"));
 						cal.add(Calendar.MINUTE, 10);
 						availSlotList.add(cal.getTimeInMillis());
-
 					} catch (Exception e) {
-						logger.error("Exception Occured for slot {} in Parsing Date : {}", jsonObject2.opt("tokenNo"),
-								e.getMessage());
+						logger.error("Exception Occured for slot {} in Parsing Date : {}",
+								document.getString("tokenNo"), e.getMessage());
 					}
 				}
 			}
@@ -278,31 +274,21 @@ public class ManagementServiceImpl implements ManagementService {
 			query.addCriteria(new Criteria().andOperator(criteriaLst));
 
 			logger.debug("query : " + query.toString());
-			List<String> slotLst = mongoTemplate.find(query, String.class, "slots");
-			JSONArray jsonArray = new JSONArray();
-			if (jsonArray != null && slotLst.size() != 0) {
-				for (int i = 0; i < slotLst.size(); i++) {
-					JSONObject jsonObject2 = new JSONObject(slotLst.get(i));
-					try {
-						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-						inputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-						jsonObject2.remove("_id");
-						jsonObject2.put("exitDateTime", inputFormat
-								.parse(jsonObject2.getJSONObject("exitDateTime").getString("$date")).getTime());
-						jsonObject2.put("entryDateTime", inputFormat
-								.parse(jsonObject2.getJSONObject("entryDateTime").getString("$date")).getTime());
-						jsonObject2.put("createdOn",
-								inputFormat.parse(jsonObject2.getJSONObject("createdOn").getString("$date")).getTime());
-						jsonArray.put(jsonObject2);
-					} catch (Exception e) {
-						logger.error("Exception Occured for slot {} in Parsing Date : {}", jsonObject2.opt("tokenNo"),
-								e.getMessage());
-					}
+			List<Document> slotLst = mongoTemplate.find(query, Document.class, "slots");
+			for (Document document : slotLst) {
+				try {
+					document.remove("_id");
+					document.put("exitDateTime", document.getDate("exitDateTime").getTime());
+					document.put("entryDateTime", document.getDate("entryDateTime").getTime());
+					document.put("createdOn", document.getDate("createdOn").getTime());
+				} catch (Exception e) {
+					logger.error("Exception Occured for slot {} in Parsing Date : {}", document.getString("tokenNo"),
+							e.getMessage());
 				}
 			}
 
 			jsonObject.put("status", "Success");
-			jsonObject.put("availableSlots", jsonArray);
+			jsonObject.put("availableSlots", slotLst);
 		} catch (Exception e) {
 			jsonObject.put("status", "Error");
 			jsonObject.put("message", e.getMessage());

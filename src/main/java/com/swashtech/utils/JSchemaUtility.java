@@ -62,7 +62,7 @@ public class JSchemaUtility {
 		logger.debug("Current Working Directory : {}", currentDir);
 		try (FileInputStream inputStream = new FileInputStream(currentDir + "/etc/config/" + fileName);) {
 			String result = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-			logger.debug("Schema File Content : {}", result);
+			logger.debug("Schema File Content : {}", result.toString());
 			jsonObject = new JSONObject(result);
 		} catch (IOException e) {
 			e.printStackTrace();
