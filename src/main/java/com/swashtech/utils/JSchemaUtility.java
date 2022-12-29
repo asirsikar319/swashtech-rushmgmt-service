@@ -1,5 +1,6 @@
 package com.swashtech.utils;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -57,8 +58,7 @@ public class JSchemaUtility {
 
 	public JSONObject readResourceFile(String fileName) {
 		JSONObject jsonObject = null;
-		ClassLoader classLoader = getClass().getClassLoader();
-		try (InputStream inputStream = classLoader.getResourceAsStream(fileName)) {
+		try (FileInputStream inputStream = new FileInputStream("etc/config/" + fileName);) {
 			String result = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
 			logger.debug("readResourceFile() : result : " + result);
 			jsonObject = new JSONObject(result);
