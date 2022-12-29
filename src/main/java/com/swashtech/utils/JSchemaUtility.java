@@ -60,7 +60,7 @@ public class JSchemaUtility {
 		JSONObject jsonObject = null;
 		String currentDir = System.getProperty("user.dir");
 		logger.debug("Current Working Directory : {}", currentDir);
-		try (FileInputStream inputStream = new FileInputStream(currentDir + "etc/config/" + fileName);) {
+		try (FileInputStream inputStream = new FileInputStream(currentDir + "/etc/config/" + fileName);) {
 			String result = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
 			logger.debug("Schema File Content : {}", result);
 			jsonObject = new JSONObject(result);

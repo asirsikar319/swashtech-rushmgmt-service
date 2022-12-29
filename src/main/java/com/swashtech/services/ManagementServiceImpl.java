@@ -43,9 +43,9 @@ public class ManagementServiceImpl implements ManagementService {
 			criteriaLst.add(Criteria.where("exitDateTime").gt(new Date(jInput.getLong("entryDateTime"))));
 
 			query.addCriteria(new Criteria().andOperator(criteriaLst));
-			System.err.println("query : "+query);
+			System.err.println("query : " + query);
 			List<String> slotLst = mongoTemplate.find(query, String.class, "slots");
-			
+
 			System.err.println(slotLst.size());
 
 			if (slotLst != null && slotLst.size() == 5) {
@@ -61,7 +61,7 @@ public class ManagementServiceImpl implements ManagementService {
 			Document document = Document.parse(jInput.toString());
 			document.put("createdOn", new Date());
 			document.put("entryDateTime", new Date(jInput.getLong("entryDateTime")));
-			
+
 			Date exitTime = new Date(jInput.getLong("entryDateTime"));
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(exitTime);
@@ -228,14 +228,19 @@ public class ManagementServiceImpl implements ManagementService {
 			if (jsonArray != null && jsonArray.length() != 0) {
 				for (int i = 0; i < jsonArray.length(); i++) {
 					JSONObject jsonObject2 = new JSONObject(jsonArray.getString(i));
+					try {
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						inputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+						Date date = inputFormat.parse(jsonObject2.getJSONObject("exitDateTime").getString("$date"));
+						Calendar cal = Calendar.getInstance();
+						cal.setTime(date);
+						cal.add(Calendar.MINUTE, 10);
+						availSlotList.add(cal.getTimeInMillis());
 
-					SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-					inputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-					Date date = inputFormat.parse(jsonObject2.getJSONObject("exitDateTime").getString("$date"));
-					Calendar cal = Calendar.getInstance();
-					cal.setTime(date);
-					cal.add(Calendar.MINUTE, 10);
-					availSlotList.add(cal.getTimeInMillis());
+					} catch (Exception e) {
+						logger.error("Exception Occured for slot {} in Parsing Date : {}", jsonObject2.opt("tokenNo"),
+								e.getMessage());
+					}
 				}
 			}
 
@@ -263,11 +268,11 @@ public class ManagementServiceImpl implements ManagementService {
 			List<Criteria> criteriaLst = new ArrayList<Criteria>();
 			criteriaLst.add(Criteria.where("orgId").is(jInput.get("orgId")));
 			criteriaLst.add(Criteria.where("oprId").is(jInput.get("oprId")));
-			if(jInput.has("mode")) {
+			if (jInput.has("mode")) {
 				criteriaLst.add(Criteria.where("mode").is(jInput.get("mode")));
 			}
-			criteriaLst.add(Criteria.where("isExit").is(jInput.has("isExit")?jInput.get("isExit"):false));
-			criteriaLst.add(Criteria.where("isEnter").is(jInput.has("isEnter")?jInput.get("isEnter"):false));
+			criteriaLst.add(Criteria.where("isExit").is(jInput.has("isExit") ? jInput.get("isExit") : false));
+			criteriaLst.add(Criteria.where("isEnter").is(jInput.has("isEnter") ? jInput.get("isEnter") : false));
 			criteriaLst.add(Criteria.where("exitDateTime").gte(new Date(jInput.getLong("frDate"))));
 			criteriaLst.add(Criteria.where("exitDateTime").lte(new Date(jInput.getLong("toDate"))));
 			query.addCriteria(new Criteria().andOperator(criteriaLst));
@@ -278,13 +283,21 @@ public class ManagementServiceImpl implements ManagementService {
 			if (jsonArray != null && slotLst.size() != 0) {
 				for (int i = 0; i < slotLst.size(); i++) {
 					JSONObject jsonObject2 = new JSONObject(slotLst.get(i));
-					SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-					inputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-					jsonObject2.remove("_id");
-					jsonObject2.put("exitDateTime", inputFormat.parse(jsonObject2.getJSONObject("exitDateTime").getString("$date")).getTime());
-					jsonObject2.put("entryDateTime", inputFormat.parse(jsonObject2.getJSONObject("entryDateTime").getString("$date")).getTime());
-					jsonObject2.put("createdOn", inputFormat.parse(jsonObject2.getJSONObject("createdOn").getString("$date")).getTime());
-					jsonArray.put(jsonObject2);
+					try {
+						SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						inputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+						jsonObject2.remove("_id");
+						jsonObject2.put("exitDateTime", inputFormat
+								.parse(jsonObject2.getJSONObject("exitDateTime").getString("$date")).getTime());
+						jsonObject2.put("entryDateTime", inputFormat
+								.parse(jsonObject2.getJSONObject("entryDateTime").getString("$date")).getTime());
+						jsonObject2.put("createdOn",
+								inputFormat.parse(jsonObject2.getJSONObject("createdOn").getString("$date")).getTime());
+						jsonArray.put(jsonObject2);
+					} catch (Exception e) {
+						logger.error("Exception Occured for slot {} in Parsing Date : {}", jsonObject2.opt("tokenNo"),
+								e.getMessage());
+					}
 				}
 			}
 
